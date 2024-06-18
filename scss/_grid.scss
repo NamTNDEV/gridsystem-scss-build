@@ -17,17 +17,27 @@ $container-max-widths: (
 );
 $grid-columns: 12;
 $grid-gutter: 30px;
+$gutters: (
+    0: 0,
+    1: 0.25,
+    2: 0.5,
+    3: 1,
+    4: 1.5,
+    5: 3,
+);
 
 %gutter-padding {
-    padding-left: $grid-gutter * 0.5;
-    padding-right: $grid-gutter * 0.5;
+    padding-left: calc(var(--grid-gutter-x) * 0.5);
+    padding-right: calc(var(--grid-gutter-x) * 0.5);
 }
 
 .container-fluid {
+    --grid-gutter-x: #{$grid-gutter};
+    --grid-gutter-y: 0;
+
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-
 }
 
 .container {
@@ -38,13 +48,18 @@ $grid-gutter: 30px;
 .row {
     display: flex;
     flex-wrap: wrap;
-    margin-left: -$grid-gutter * 0.5;
-    margin-right: -$grid-gutter * 0.5;
+    margin-left: calc(var(--grid-gutter-x) * 0.5 * -1);
+    margin-right: calc(var(--grid-gutter-x) * 0.5 * -1);
+    margin-top: calc(var(--grid-gutter-y) * -1);
 
     &[class*='row-cols-']>*,
     [class*='col-'] {
         flex: 0 0 auto;
         @extend %gutter-padding;
+    }
+
+    >* {
+        margin-top: calc(var(--grid-gutter-y));
     }
 }
 
@@ -73,7 +88,7 @@ $grid-gutter: 30px;
     }
 }
 
-@mixin make-col($infix) {
+@mixin make-cols($infix) {
     @for $i from 1 through $grid-columns {
         .col#{$infix}-#{$i} {
             width: math.div(100%, $grid-columns) * $i;
@@ -81,10 +96,25 @@ $grid-gutter: 30px;
     }
 }
 
-@mixin make-offset($infix) {
+@mixin make-offsets($infix) {
     @for $i from 0 to $grid-columns {
         .offset#{$infix}-#{$i} {
             margin-left: if($i > 0, math.div(100%, $grid-columns) * $i, 0);
+        }
+    }
+}
+
+@mixin make-gutters($infix) {
+    @each $i, $ratio in $gutters {
+
+        .g#{$infix}-#{$i},
+        .gx#{$infix}-#{$i} {
+            --grid-gutter-x: #{$grid-gutter * $ratio};
+        }
+
+        .g#{$infix}-#{$i},
+        .gy#{$infix}-#{$i} {
+            --grid-gutter-y: #{$grid-gutter * $ratio};
         }
     }
 }
@@ -100,8 +130,9 @@ $grid-gutter: 30px;
         }
 
         @include make-row-columns($infix);
-        @include make-col($infix);
-        @include make-offset($infix);
+        @include make-cols($infix);
+        @include make-offsets($infix);
+        @include make-gutters($infix);
 
     }
 }
