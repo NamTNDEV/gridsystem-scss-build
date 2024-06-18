@@ -81,6 +81,14 @@ $grid-gutter: 30px;
     }
 }
 
+@mixin make-offset($infix) {
+    @for $i from 0 to $grid-columns {
+        .offset#{$infix}-#{$i} {
+            margin-left: if($i > 0, math.div(100%, $grid-columns) * $i, 0);
+        }
+    }
+}
+
 @each $breakpoint, $dimension in $grid-breakpoints {
     $max-width: map-get($container-max-widths, $breakpoint);
     $infix: if($breakpoint ==xs, '', '-#{$breakpoint}');
@@ -93,6 +101,7 @@ $grid-gutter: 30px;
 
         @include make-row-columns($infix);
         @include make-col($infix);
+        @include make-offset($infix);
 
     }
 }
