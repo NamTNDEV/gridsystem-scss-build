@@ -41,6 +41,7 @@ $grid-gutter: 30px;
     margin-left: -$grid-gutter * 0.5;
     margin-right: -$grid-gutter * 0.5;
 
+    &[class*='row-cols-']>*,
     [class*='col-'] {
         flex: 0 0 auto;
         @extend %gutter-padding;
@@ -64,6 +65,22 @@ $grid-gutter: 30px;
     }
 }
 
+@mixin make-row-columns($infix) {
+    @for $i from 1 through $grid-columns {
+        .row-cols#{$infix}-#{$i}>* {
+            width: math.div(100%, $i);
+        }
+    }
+}
+
+@mixin make-col($infix) {
+    @for $i from 1 through $grid-columns {
+        .col#{$infix}-#{$i} {
+            width: math.div(100%, $grid-columns) * $i;
+        }
+    }
+}
+
 @each $breakpoint, $dimension in $grid-breakpoints {
     $max-width: map-get($container-max-widths, $breakpoint);
     $infix: if($breakpoint ==xs, '', '-#{$breakpoint}');
@@ -74,10 +91,8 @@ $grid-gutter: 30px;
             max-width: $max-width;
         }
 
-        @for $i from 1 through $grid-columns {
-            .col#{$infix}-#{$i} {
-                width: math.div(100%, $grid-columns) * $i;
-            }
-        }
+        @include make-row-columns($infix);
+        @include make-col($infix);
+
     }
 }
